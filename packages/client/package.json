@@ -1,7 +1,7 @@
 {
   "name": "@chanx-js/client",
   "version": "0.1.0",
-  "description": "Type-safe WebSocket client for chanx AsyncAPI schemas, with topic multiplexing.",
+  "description": "Type-safe WebSocket client for chanx AsyncAPI schemas, with topic multiplexing. React, Vue, Svelte and Solid bindings.",
   "license": "MIT",
   "author": "Huy Nguyen",
   "type": "module",
@@ -17,23 +17,50 @@
     "./react": {
       "types": "./dist/react/index.d.mts",
       "default": "./dist/react/index.mjs"
+    },
+    "./vue": {
+      "types": "./dist/vue/index.d.mts",
+      "default": "./dist/vue/index.mjs"
+    },
+    "./svelte": {
+      "types": "./dist/svelte/index.d.mts",
+      "default": "./dist/svelte/index.mjs"
+    },
+    "./solid": {
+      "types": "./dist/solid/index.d.mts",
+      "default": "./dist/solid/index.mjs"
     }
   },
   "scripts": {
-    "build": "tsdown src/index.ts src/react/index.ts --format esm --dts --clean --external react",
+    "build": "tsdown src/index.ts src/react/index.ts src/vue/index.ts src/svelte/index.ts src/solid/index.ts --format esm --dts --clean --external react --external vue --external svelte --external svelte/store --external solid-js --external solid-js/web",
     "typecheck": "tsc -p tsconfig.json"
   },
   "peerDependencies": {
-    "react": ">=18"
+    "react": ">=18",
+    "solid-js": ">=1.8",
+    "svelte": ">=4",
+    "vue": ">=3.4"
   },
   "peerDependenciesMeta": {
     "react": {
+      "optional": true
+    },
+    "solid-js": {
+      "optional": true
+    },
+    "svelte": {
+      "optional": true
+    },
+    "vue": {
       "optional": true
     }
   },
   "devDependencies": {
     "@types/react": "^19.1.8",
-    "react": "^19.1.0"
+    "react": "^19.1.0",
+    "solid-js": "^1.9.3",
+    "svelte": "^5.16.0",
+    "vue": "^3.5.13"
   },
   "engines": {
     "node": ">=20"
@@ -43,6 +70,9 @@
     "asyncapi",
     "@chanx-js/client",
     "typescript",
-    "react"
+    "react",
+    "vue",
+    "svelte",
+    "solid"
   ]
 }
