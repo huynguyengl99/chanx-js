@@ -1,0 +1,1194 @@
+{
+  "asyncapi": "3.0.0",
+  "info": {
+    "title": "CHANX AsyncAPI Documentation",
+    "version": "1.0.0",
+    "description": "Websocket schema of Chanx"
+  },
+  "servers": {
+    "production": {
+      "host": "testserver",
+      "protocol": "ws"
+    }
+  },
+  "channels": {
+    "assistants": {
+      "address": "ws/assistants/{pk}/",
+      "title": "assistants",
+      "description": "AI Assistant WebSocket API",
+      "parameters": {
+        "pk": {
+          "description": "Path parameter for pk (regex: [0-9a-f-]+)"
+        }
+      },
+      "messages": {
+        "assistantErrorMessage": {
+          "$ref": "#/components/messages/assistantErrorMessage"
+        },
+        "completeStreamingMessage": {
+          "$ref": "#/components/messages/completeStreamingMessage"
+        },
+        "newAssistantMessage": {
+          "$ref": "#/components/messages/newAssistantMessage"
+        },
+        "pingMessage": {
+          "$ref": "#/components/messages/pingMessage"
+        },
+        "pongMessage": {
+          "$ref": "#/components/messages/pongMessage"
+        },
+        "streamingMessage": {
+          "$ref": "#/components/messages/streamingMessage"
+        }
+      },
+      "tags": [
+        {
+          "name": "ai"
+        },
+        {
+          "name": "chat"
+        }
+      ]
+    },
+    "discussionList": {
+      "address": "ws/discussion/",
+      "title": "discussion_list",
+      "description": "\nWebSocket consumer for discussion topic list view.\n\nHandles global discussion updates like new topics, votes, and answer acceptance/unacceptance.\n",
+      "messages": {
+        "answerAcceptedMessage": {
+          "$ref": "#/components/messages/answerAcceptedMessage"
+        },
+        "answerUnacceptedMessage": {
+          "$ref": "#/components/messages/answerUnacceptedMessage"
+        },
+        "pingMessage": {
+          "$ref": "#/components/messages/pingMessage"
+        },
+        "pongMessage": {
+          "$ref": "#/components/messages/pongMessage"
+        },
+        "topicCreatedMessage": {
+          "$ref": "#/components/messages/topicCreatedMessage"
+        },
+        "voteUpdatedMessage": {
+          "$ref": "#/components/messages/voteUpdatedMessage"
+        }
+      }
+    },
+    "discussionTopic": {
+      "address": "ws/discussion/{pk}/",
+      "title": "discussion_topic",
+      "description": "\nWebSocket consumer for discussion topic detail view.\n\nHandles topic-specific operations like replying, voting, and accepting/unaccepting answers.\n",
+      "parameters": {
+        "pk": {
+          "description": "Path parameter for pk (int)"
+        }
+      },
+      "messages": {
+        "answerAcceptedMessage": {
+          "$ref": "#/components/messages/answerAcceptedMessage"
+        },
+        "answerUnacceptedMessage": {
+          "$ref": "#/components/messages/answerUnacceptedMessage"
+        },
+        "pingMessage": {
+          "$ref": "#/components/messages/pingMessage"
+        },
+        "pongMessage": {
+          "$ref": "#/components/messages/pongMessage"
+        },
+        "replyCreatedMessage": {
+          "$ref": "#/components/messages/replyCreatedMessage"
+        },
+        "voteUpdatedMessage": {
+          "$ref": "#/components/messages/voteUpdatedMessage"
+        }
+      }
+    },
+    "groupChat": {
+      "address": "ws/chat/group/",
+      "title": "group_chat",
+      "description": "\nWebSocket consumer for group chat updates.\n",
+      "messages": {
+        "addedToGroupMessage": {
+          "$ref": "#/components/messages/addedToGroupMessage"
+        },
+        "groupChatUpdatedMessage": {
+          "$ref": "#/components/messages/groupChatUpdatedMessage"
+        },
+        "pingMessage": {
+          "$ref": "#/components/messages/pingMessage"
+        },
+        "pongMessage": {
+          "$ref": "#/components/messages/pongMessage"
+        },
+        "removedFromGroupMessage": {
+          "$ref": "#/components/messages/removedFromGroupMessage"
+        }
+      }
+    },
+    "chatDetail": {
+      "address": "ws/chat/{pk}/",
+      "title": "chat_detail",
+      "description": "WebSocket consumer for group chat details.",
+      "parameters": {
+        "pk": {
+          "description": "Path parameter for pk (regex: \\d+)"
+        }
+      },
+      "messages": {
+        "memberAddedMessage": {
+          "$ref": "#/components/messages/memberAddedMessage"
+        },
+        "memberMessage": {
+          "$ref": "#/components/messages/memberMessage"
+        },
+        "memberRemovedMessage": {
+          "$ref": "#/components/messages/memberRemovedMessage"
+        },
+        "pingMessage": {
+          "$ref": "#/components/messages/pingMessage"
+        },
+        "pongMessage": {
+          "$ref": "#/components/messages/pongMessage"
+        },
+        "userRemovedFromGroupMessage": {
+          "$ref": "#/components/messages/userRemovedFromGroupMessage"
+        }
+      }
+    }
+  },
+  "operations": {
+    "handlePing": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/assistants"
+      },
+      "description": "Simple ping-pong for connectivity testing",
+      "summary": "Handle ping requests",
+      "messages": [
+        {
+          "$ref": "#/channels/assistants/messages/pingMessage"
+        }
+      ],
+      "reply": {
+        "channel": {
+          "$ref": "#/channels/assistants"
+        },
+        "messages": [
+          {
+            "$ref": "#/channels/assistants/messages/pongMessage"
+          }
+        ]
+      }
+    },
+    "handleCompleteStreaming": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/assistants"
+      },
+      "description": "",
+      "summary": "",
+      "messages": [
+        {
+          "$ref": "#/channels/assistants/messages/completeStreamingMessage"
+        }
+      ]
+    },
+    "handleErrorAssistantEvent": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/assistants"
+      },
+      "description": "",
+      "summary": "",
+      "messages": [
+        {
+          "$ref": "#/channels/assistants/messages/assistantErrorMessage"
+        }
+      ]
+    },
+    "handleNewAssistantMessage": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/assistants"
+      },
+      "description": "",
+      "summary": "",
+      "messages": [
+        {
+          "$ref": "#/channels/assistants/messages/newAssistantMessage"
+        }
+      ]
+    },
+    "handleStreaming": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/assistants"
+      },
+      "description": "",
+      "summary": "",
+      "messages": [
+        {
+          "$ref": "#/channels/assistants/messages/streamingMessage"
+        }
+      ]
+    },
+    "discussionListHandlePing": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/discussionList"
+      },
+      "description": "Simple ping-pong for connectivity testing",
+      "summary": "Handle ping requests",
+      "messages": [
+        {
+          "$ref": "#/channels/discussionList/messages/pingMessage"
+        }
+      ],
+      "reply": {
+        "channel": {
+          "$ref": "#/channels/discussionList"
+        },
+        "messages": [
+          {
+            "$ref": "#/channels/discussionList/messages/pongMessage"
+          }
+        ]
+      }
+    },
+    "handleAcceptAnswer": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/discussionList"
+      },
+      "description": "",
+      "summary": "",
+      "messages": [
+        {
+          "$ref": "#/channels/discussionList/messages/answerAcceptedMessage"
+        }
+      ]
+    },
+    "handleNewTopic": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/discussionList"
+      },
+      "description": "",
+      "summary": "",
+      "messages": [
+        {
+          "$ref": "#/channels/discussionList/messages/topicCreatedMessage"
+        }
+      ]
+    },
+    "handleUnacceptAnswer": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/discussionList"
+      },
+      "description": "",
+      "summary": "",
+      "messages": [
+        {
+          "$ref": "#/channels/discussionList/messages/answerUnacceptedMessage"
+        }
+      ]
+    },
+    "handleVoteUpdate": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/discussionList"
+      },
+      "description": "",
+      "summary": "",
+      "messages": [
+        {
+          "$ref": "#/channels/discussionList/messages/voteUpdatedMessage"
+        }
+      ]
+    },
+    "discussionTopicHandlePing": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/discussionTopic"
+      },
+      "description": "Simple ping-pong for connectivity testing",
+      "summary": "Handle ping requests",
+      "messages": [
+        {
+          "$ref": "#/channels/discussionTopic/messages/pingMessage"
+        }
+      ],
+      "reply": {
+        "channel": {
+          "$ref": "#/channels/discussionTopic"
+        },
+        "messages": [
+          {
+            "$ref": "#/channels/discussionTopic/messages/pongMessage"
+          }
+        ]
+      }
+    },
+    "discussionTopicHandleAcceptAnswer": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/discussionTopic"
+      },
+      "description": "",
+      "summary": "",
+      "messages": [
+        {
+          "$ref": "#/channels/discussionTopic/messages/answerAcceptedMessage"
+        }
+      ]
+    },
+    "handleNewReply": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/discussionTopic"
+      },
+      "description": "",
+      "summary": "",
+      "messages": [
+        {
+          "$ref": "#/channels/discussionTopic/messages/replyCreatedMessage"
+        }
+      ]
+    },
+    "discussionTopicHandleUnacceptAnswer": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/discussionTopic"
+      },
+      "description": "",
+      "summary": "",
+      "messages": [
+        {
+          "$ref": "#/channels/discussionTopic/messages/answerUnacceptedMessage"
+        }
+      ]
+    },
+    "discussionTopicHandleVoteUpdate": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/discussionTopic"
+      },
+      "description": "",
+      "summary": "",
+      "messages": [
+        {
+          "$ref": "#/channels/discussionTopic/messages/voteUpdatedMessage"
+        }
+      ]
+    },
+    "groupChatHandlePing": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/groupChat"
+      },
+      "description": "Simple ping-pong for connectivity testing",
+      "summary": "Handle ping requests",
+      "messages": [
+        {
+          "$ref": "#/channels/groupChat/messages/pingMessage"
+        }
+      ],
+      "reply": {
+        "channel": {
+          "$ref": "#/channels/groupChat"
+        },
+        "messages": [
+          {
+            "$ref": "#/channels/groupChat/messages/pongMessage"
+          }
+        ]
+      }
+    },
+    "handleGroupChatUpdate": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/groupChat"
+      },
+      "description": "",
+      "summary": "",
+      "messages": [
+        {
+          "$ref": "#/channels/groupChat/messages/groupChatUpdatedMessage"
+        }
+      ]
+    },
+    "handleNotifyAddedToGroup": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/groupChat"
+      },
+      "description": "",
+      "summary": "",
+      "messages": [
+        {
+          "$ref": "#/channels/groupChat/messages/addedToGroupMessage"
+        }
+      ]
+    },
+    "handleNotifyRemovedFromGroup": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/groupChat"
+      },
+      "description": "",
+      "summary": "",
+      "messages": [
+        {
+          "$ref": "#/channels/groupChat/messages/removedFromGroupMessage"
+        }
+      ]
+    },
+    "chatDetailHandlePing": {
+      "action": "receive",
+      "channel": {
+        "$ref": "#/channels/chatDetail"
+      },
+      "description": "Simple ping-pong for connectivity testing",
+      "summary": "Handle ping requests",
+      "messages": [
+        {
+          "$ref": "#/channels/chatDetail/messages/pingMessage"
+        }
+      ],
+      "reply": {
+        "channel": {
+          "$ref": "#/channels/chatDetail"
+        },
+        "messages": [
+          {
+            "$ref": "#/channels/chatDetail/messages/pongMessage"
+          }
+        ]
+      }
+    },
+    "handleMemberAdded": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/chatDetail"
+      },
+      "description": "",
+      "summary": "",
+      "messages": [
+        {
+          "$ref": "#/channels/chatDetail/messages/memberAddedMessage"
+        }
+      ]
+    },
+    "handleMemberRemoved": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/chatDetail"
+      },
+      "description": "",
+      "summary": "",
+      "messages": [
+        {
+          "$ref": "#/channels/chatDetail/messages/userRemovedFromGroupMessage"
+        },
+        {
+          "$ref": "#/channels/chatDetail/messages/memberRemovedMessage"
+        }
+      ]
+    },
+    "handleNewChatMessage": {
+      "action": "send",
+      "channel": {
+        "$ref": "#/channels/chatDetail"
+      },
+      "description": "",
+      "summary": "",
+      "messages": [
+        {
+          "$ref": "#/channels/chatDetail/messages/memberMessage"
+        }
+      ]
+    }
+  },
+  "components": {
+    "messages": {
+      "addedToGroupMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/AddedToGroupMessage"
+        }
+      },
+      "answerAcceptedMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/AnswerAcceptedMessage"
+        }
+      },
+      "answerUnacceptedMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/AnswerUnacceptedMessage"
+        }
+      },
+      "assistantErrorMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/AssistantErrorMessage"
+        }
+      },
+      "completeStreamingMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/CompleteStreamingMessage"
+        }
+      },
+      "groupChatUpdatedMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/GroupChatUpdatedMessage"
+        }
+      },
+      "memberAddedMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/MemberAddedMessage"
+        }
+      },
+      "memberMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/MemberMessage"
+        }
+      },
+      "memberRemovedMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/MemberRemovedMessage"
+        }
+      },
+      "newAssistantMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/NewAssistantMessage"
+        }
+      },
+      "pingMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/PingMessage"
+        }
+      },
+      "pongMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/PongMessage"
+        }
+      },
+      "removedFromGroupMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/RemovedFromGroupMessage"
+        }
+      },
+      "replyCreatedMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/ReplyCreatedMessage"
+        }
+      },
+      "streamingMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/StreamingMessage"
+        }
+      },
+      "topicCreatedMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/TopicCreatedMessage"
+        }
+      },
+      "userRemovedFromGroupMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/UserRemovedFromGroupMessage"
+        }
+      },
+      "voteUpdatedMessage": {
+        "payload": {
+          "$ref": "#/components/schemas/VoteUpdatedMessage"
+        }
+      }
+    },
+    "schemas": {
+      "AddedToGroupMessage": {
+        "properties": {
+          "action": {
+            "const": "added_to_group",
+            "default": "added_to_group",
+            "title": "Action",
+            "type": "string"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object"
+          }
+        },
+        "required": ["payload"],
+        "title": "AddedToGroupMessage",
+        "type": "object"
+      },
+      "AnswerAcceptedEventPayload": {
+        "description": "Payload for answer accepted events.",
+        "properties": {
+          "topicId": {
+            "title": "Topic Id",
+            "type": "integer"
+          },
+          "topicTitle": {
+            "title": "Topic Title",
+            "type": "string"
+          },
+          "replyId": {
+            "title": "Reply Id",
+            "type": "integer"
+          },
+          "replyAuthor": {
+            "title": "Reply Author",
+            "type": "string"
+          }
+        },
+        "required": ["topicId", "topicTitle", "replyId", "replyAuthor"],
+        "title": "AnswerAcceptedEventPayload",
+        "type": "object"
+      },
+      "AnswerAcceptedMessage": {
+        "description": "Broadcast when an answer is accepted.",
+        "properties": {
+          "action": {
+            "const": "answer_accepted",
+            "default": "answer_accepted",
+            "title": "Action",
+            "type": "string"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/AnswerAcceptedEventPayload"
+          }
+        },
+        "required": ["payload"],
+        "title": "AnswerAcceptedMessage",
+        "type": "object"
+      },
+      "AnswerUnacceptedEventPayload": {
+        "description": "Payload for answer unaccepted events.",
+        "properties": {
+          "topicId": {
+            "title": "Topic Id",
+            "type": "integer"
+          },
+          "topicTitle": {
+            "title": "Topic Title",
+            "type": "string"
+          },
+          "replyId": {
+            "title": "Reply Id",
+            "type": "integer"
+          },
+          "replyAuthor": {
+            "title": "Reply Author",
+            "type": "string"
+          }
+        },
+        "required": ["topicId", "topicTitle", "replyId", "replyAuthor"],
+        "title": "AnswerUnacceptedEventPayload",
+        "type": "object"
+      },
+      "AnswerUnacceptedMessage": {
+        "description": "Broadcast when an answer is unaccepted.",
+        "properties": {
+          "action": {
+            "const": "answer_unaccepted",
+            "default": "answer_unaccepted",
+            "title": "Action",
+            "type": "string"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/AnswerUnacceptedEventPayload"
+          }
+        },
+        "required": ["payload"],
+        "title": "AnswerUnacceptedMessage",
+        "type": "object"
+      },
+      "AssistantErrorMessage": {
+        "description": "Error message from assistant.",
+        "properties": {
+          "action": {
+            "const": "assistant_error",
+            "default": "assistant_error",
+            "title": "Action",
+            "type": "string"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/ErrorPayload"
+          }
+        },
+        "required": ["payload"],
+        "title": "AssistantErrorMessage",
+        "type": "object"
+      },
+      "CompleteStreamingMessage": {
+        "description": "Streaming message chunk from assistant.",
+        "properties": {
+          "action": {
+            "const": "complete_streaming",
+            "default": "complete_streaming",
+            "title": "Action",
+            "type": "string"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/StreamingPayload"
+          }
+        },
+        "required": ["payload"],
+        "title": "CompleteStreamingMessage",
+        "type": "object"
+      },
+      "ErrorPayload": {
+        "properties": {
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "messageId": {
+            "title": "Message Id",
+            "type": "string"
+          }
+        },
+        "required": ["content", "messageId"],
+        "title": "ErrorPayload",
+        "type": "object"
+      },
+      "GroupChatUpdatePayload": {
+        "properties": {
+          "groupPk": {
+            "title": "Group Pk",
+            "type": "integer"
+          },
+          "updatedAt": {
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": ["groupPk", "updatedAt"],
+        "title": "GroupChatUpdatePayload",
+        "type": "object"
+      },
+      "GroupChatUpdatedMessage": {
+        "properties": {
+          "action": {
+            "const": "group_chat_updated",
+            "default": "group_chat_updated",
+            "title": "Action",
+            "type": "string"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/GroupChatUpdatePayload"
+          }
+        },
+        "required": ["payload"],
+        "title": "GroupChatUpdatedMessage",
+        "type": "object"
+      },
+      "GroupRemovePayload": {
+        "properties": {
+          "groupPk": {
+            "title": "Group Pk",
+            "type": "integer"
+          },
+          "groupTitle": {
+            "title": "Group Title",
+            "type": "string"
+          }
+        },
+        "required": ["groupPk", "groupTitle"],
+        "title": "GroupRemovePayload",
+        "type": "object"
+      },
+      "MemberAddedMessage": {
+        "properties": {
+          "action": {
+            "const": "member_added",
+            "default": "member_added",
+            "title": "Action",
+            "type": "string"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object"
+          }
+        },
+        "required": ["payload"],
+        "title": "MemberAddedMessage",
+        "type": "object"
+      },
+      "MemberMessage": {
+        "properties": {
+          "action": {
+            "const": "member_message",
+            "default": "member_message",
+            "title": "Action",
+            "type": "string"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object"
+          }
+        },
+        "required": ["payload"],
+        "title": "MemberMessage",
+        "type": "object"
+      },
+      "MemberRemovedMessage": {
+        "properties": {
+          "action": {
+            "const": "member_removed",
+            "default": "member_removed",
+            "title": "Action",
+            "type": "string"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/MemberRemovedPayload"
+          }
+        },
+        "required": ["payload"],
+        "title": "MemberRemovedMessage",
+        "type": "object"
+      },
+      "MemberRemovedPayload": {
+        "properties": {
+          "userPk": {
+            "title": "User Pk",
+            "type": "integer"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          }
+        },
+        "required": ["userPk", "email"],
+        "title": "MemberRemovedPayload",
+        "type": "object"
+      },
+      "NewAssistantMessage": {
+        "description": "New assistant message (user or AI).",
+        "properties": {
+          "action": {
+            "const": "new_assistant_message",
+            "default": "new_assistant_message",
+            "title": "Action",
+            "type": "string"
+          },
+          "payload": {
+            "additionalProperties": true,
+            "title": "Payload",
+            "type": "object"
+          }
+        },
+        "required": ["payload"],
+        "title": "NewAssistantMessage",
+        "type": "object"
+      },
+      "NewReplyEventPayload": {
+        "description": "Payload for new reply channel events.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "author": {
+            "additionalProperties": true,
+            "title": "Author",
+            "type": "object"
+          },
+          "voteCount": {
+            "title": "Vote Count",
+            "type": "integer"
+          },
+          "isAccepted": {
+            "title": "Is Accepted",
+            "type": "boolean"
+          },
+          "createdAt": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "formattedCreatedAt": {
+            "title": "Formatted Created At",
+            "type": "string"
+          },
+          "topicId": {
+            "title": "Topic Id",
+            "type": "integer"
+          },
+          "topicTitle": {
+            "title": "Topic Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "content",
+          "author",
+          "voteCount",
+          "isAccepted",
+          "createdAt",
+          "formattedCreatedAt",
+          "topicId",
+          "topicTitle"
+        ],
+        "title": "NewReplyEventPayload",
+        "type": "object"
+      },
+      "NewTopicEventPayload": {
+        "description": "Payload for new topic channel events.",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "author": {
+            "additionalProperties": true,
+            "title": "Author",
+            "type": "object"
+          },
+          "voteCount": {
+            "title": "Vote Count",
+            "type": "integer"
+          },
+          "replyCount": {
+            "title": "Reply Count",
+            "type": "integer"
+          },
+          "hasAcceptedAnswer": {
+            "title": "Has Accepted Answer",
+            "type": "boolean"
+          },
+          "viewCount": {
+            "title": "View Count",
+            "type": "integer"
+          },
+          "createdAt": {
+            "title": "Created At",
+            "type": "string"
+          },
+          "formattedCreatedAt": {
+            "title": "Formatted Created At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "author",
+          "voteCount",
+          "replyCount",
+          "hasAcceptedAnswer",
+          "viewCount",
+          "createdAt",
+          "formattedCreatedAt"
+        ],
+        "title": "NewTopicEventPayload",
+        "type": "object"
+      },
+      "Payload": {
+        "properties": {
+          "redirect": {
+            "title": "Redirect",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": ["redirect", "message"],
+        "title": "Payload",
+        "type": "object"
+      },
+      "PingMessage": {
+        "description": "Simple ping message to check WebSocket connection status.",
+        "properties": {
+          "action": {
+            "const": "ping",
+            "default": "ping",
+            "title": "Action",
+            "type": "string"
+          },
+          "payload": {
+            "default": null,
+            "title": "Payload",
+            "type": "null"
+          }
+        },
+        "title": "PingMessage",
+        "type": "object"
+      },
+      "PongMessage": {
+        "description": "Simple pong message response to ping requests.",
+        "properties": {
+          "action": {
+            "const": "pong",
+            "default": "pong",
+            "title": "Action",
+            "type": "string"
+          },
+          "payload": {
+            "default": null,
+            "title": "Payload",
+            "type": "null"
+          }
+        },
+        "title": "PongMessage",
+        "type": "object"
+      },
+      "RemovedFromGroupMessage": {
+        "properties": {
+          "action": {
+            "const": "removed_from_group",
+            "default": "removed_from_group",
+            "title": "Action",
+            "type": "string"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/GroupRemovePayload"
+          }
+        },
+        "required": ["payload"],
+        "title": "RemovedFromGroupMessage",
+        "type": "object"
+      },
+      "ReplyCreatedMessage": {
+        "description": "Broadcast when a new reply is created.",
+        "properties": {
+          "action": {
+            "const": "reply_created",
+            "default": "reply_created",
+            "title": "Action",
+            "type": "string"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/NewReplyEventPayload"
+          }
+        },
+        "required": ["payload"],
+        "title": "ReplyCreatedMessage",
+        "type": "object"
+      },
+      "StreamingMessage": {
+        "description": "Streaming message chunk from assistant.",
+        "properties": {
+          "action": {
+            "const": "streaming",
+            "default": "streaming",
+            "title": "Action",
+            "type": "string"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/StreamingPayload"
+          }
+        },
+        "required": ["payload"],
+        "title": "StreamingMessage",
+        "type": "object"
+      },
+      "StreamingPayload": {
+        "properties": {
+          "content": {
+            "title": "Content",
+            "type": "string"
+          },
+          "isComplete": {
+            "default": false,
+            "title": "Is Complete",
+            "type": "boolean"
+          },
+          "messageId": {
+            "title": "Message Id",
+            "type": "integer"
+          }
+        },
+        "required": ["content", "messageId"],
+        "title": "StreamingPayload",
+        "type": "object"
+      },
+      "TopicCreatedMessage": {
+        "description": "Broadcast when a new topic is created.",
+        "properties": {
+          "action": {
+            "const": "topic_created",
+            "default": "topic_created",
+            "title": "Action",
+            "type": "string"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/NewTopicEventPayload"
+          }
+        },
+        "required": ["payload"],
+        "title": "TopicCreatedMessage",
+        "type": "object"
+      },
+      "UserRemovedFromGroupMessage": {
+        "properties": {
+          "action": {
+            "const": "user_removed_from_group",
+            "default": "user_removed_from_group",
+            "title": "Action",
+            "type": "string"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/Payload"
+          }
+        },
+        "required": ["payload"],
+        "title": "UserRemovedFromGroupMessage",
+        "type": "object"
+      },
+      "VotePayload": {
+        "description": "Base payload for vote-related operations.",
+        "properties": {
+          "targetType": {
+            "enum": ["topic", "reply"],
+            "title": "Target Type",
+            "type": "string"
+          },
+          "targetId": {
+            "title": "Target Id",
+            "type": "integer"
+          },
+          "voteCount": {
+            "title": "Vote Count",
+            "type": "integer"
+          }
+        },
+        "required": ["targetType", "targetId", "voteCount"],
+        "title": "VotePayload",
+        "type": "object"
+      },
+      "VoteUpdatedMessage": {
+        "description": "Broadcast when votes are updated.",
+        "properties": {
+          "action": {
+            "const": "vote_updated",
+            "default": "vote_updated",
+            "title": "Action",
+            "type": "string"
+          },
+          "payload": {
+            "$ref": "#/components/schemas/VotePayload"
+          }
+        },
+        "required": ["payload"],
+        "title": "VoteUpdatedMessage",
+        "type": "object"
+      }
+    }
+  }
+}

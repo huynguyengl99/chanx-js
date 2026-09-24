@@ -1,0 +1,50 @@
+{
+  "name": "@chanx-js/codegen",
+  "version": "0.1.0",
+  "description": "Generate TypeScript channel descriptors and message types from a chanx AsyncAPI 3 schema.",
+  "license": "MIT",
+  "author": "Huy Nguyen",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "bin": {
+    "chanx-codegen": "./dist/cli.mjs"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "scripts": {
+    "build": "tsdown src/index.ts src/cli.ts --format esm --dts --clean",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "cac": "^6.7.14",
+    "ts-morph": "^28.0.0",
+    "yaml": "^2.7.0"
+  },
+  "peerDependencies": {
+    "prettier": ">=3"
+  },
+  "peerDependenciesMeta": {
+    "prettier": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "asyncapi",
+    "@chanx-js/client",
+    "codegen",
+    "typescript",
+    "websocket"
+  ],
+  "devDependencies": {
+    "zod": "^3.25.76"
+  }
+}
