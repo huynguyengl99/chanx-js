@@ -13,11 +13,27 @@
     ".": {
       "types": "./dist/index.d.mts",
       "default": "./dist/index.mjs"
+    },
+    "./react": {
+      "types": "./dist/react/index.d.mts",
+      "default": "./dist/react/index.mjs"
     }
   },
   "scripts": {
-    "build": "tsdown src/index.ts --format esm --dts --clean",
+    "build": "tsdown src/index.ts src/react/index.ts --format esm --dts --clean --external react",
     "typecheck": "tsc -p tsconfig.json"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.8",
+    "react": "^19.1.0"
   },
   "engines": {
     "node": ">=20"
@@ -26,6 +42,7 @@
     "websocket",
     "asyncapi",
     "@chanx-js/client",
-    "typescript"
+    "typescript",
+    "react"
   ]
 }
