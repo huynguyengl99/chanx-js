@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": true,
+    "declaration": false,
+    // checkJs would otherwise follow JS imports into node_modules and type-check them.
+    "maxNodeModuleJsDepth": 0,
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "@chanx-js/client": ["../packages/client/src/index.ts"]
+    }
+  },
+  "include": ["generated", "usage.js"],
+  "exclude": ["**/node_modules/**"]
+}

@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@chanx-js/client": ["../packages/client/src/index.ts"],
+      "@chanx-js/client/react": ["../packages/client/src/react/index.ts"]
+    }
+  },
+  "include": ["generated", "usage.ts"]
+}

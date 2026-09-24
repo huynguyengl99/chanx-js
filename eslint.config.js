@@ -5,7 +5,13 @@ import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
-    ignores: ['**/dist/**', '**/node_modules/**', '**/tests/__fixtures__/**'],
+    ignores: [
+      '**/dist/**',
+      '**/node_modules/**',
+      'conformance/generated/**',
+      'conformance-js/generated/**',
+      '**/tests/__fixtures__/**',
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -19,6 +25,11 @@ export default tseslint.config(
         { ignoreRestSiblings: true, argsIgnorePattern: '^_' },
       ],
     },
+  },
+  {
+    // Hand-written plain JavaScript, type-checked by tsc through checkJs instead.
+    files: ['conformance-js/**/*.js'],
+    languageOptions: { globals: { console: 'readonly' } },
   },
   {
     // React-only. The other bindings expose functions named `useChannel` too, and a

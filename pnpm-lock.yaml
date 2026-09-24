@@ -63,6 +63,35 @@ importers:
         specifier: ^8.21.3
         version: 8.21.3
 
+  conformance:
+    dependencies:
+      '@chanx-js/client':
+        specifier: workspace:*
+        version: link:../packages/client
+    devDependencies:
+      '@types/react':
+        specifier: ^19.1.8
+        version: 19.3.0
+      react:
+        specifier: ^19.1.0
+        version: 19.3.0
+      tsx:
+        specifier: ^4.20.0
+        version: 4.23.13
+      zod:
+        specifier: ^3.25.76
+        version: 3.25.76
+
+  conformance-js:
+    dependencies:
+      '@chanx-js/client':
+        specifier: workspace:*
+        version: link:../packages/client
+    devDependencies:
+      tsx:
+        specifier: ^4.20.0
+        version: 4.23.13
+
   packages/client:
     devDependencies:
       '@types/react':
@@ -3347,7 +3376,6 @@ snapshots:
       esbuild: 0.28.2
     optionalDependencies:
       fsevents: 2.3.3
-    optional: true
 
   type-check@0.4.0:
     dependencies:

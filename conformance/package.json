@@ -1,0 +1,20 @@
+{
+  "name": "chanx-conformance",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Generated from the real chanx sandbox schema, then compiled. Proves the emitted code narrows against the runtime, and `git diff --exit-code` catches drift.",
+  "scripts": {
+    "gen": "tsx ../packages/codegen/src/cli.ts ../packages/codegen/tests/__fixtures__/fastapi-asyncapi.json -o generated --validation zod",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@chanx-js/client": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.8",
+    "react": "^19.1.0",
+    "tsx": "^4.20.0",
+    "zod": "^3.25.76"
+  }
+}
