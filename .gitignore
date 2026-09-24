@@ -4,4 +4,7 @@ coverage/
 *.tsbuildinfo
 .DS_Store
 .vitest/
+docs/api/
+docs/.vitepress/dist/
+docs/.vitepress/cache/
 packages/codegen/tests/.generated-*/

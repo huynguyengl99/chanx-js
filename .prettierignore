@@ -3,3 +3,6 @@ node_modules/
 coverage/
 packages/*/tests/__fixtures__/generated/
 pnpm-lock.yaml
+docs/api/
+docs/.vitepress/dist/
+docs/.vitepress/cache/

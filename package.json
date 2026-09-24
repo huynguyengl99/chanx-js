@@ -9,6 +9,8 @@
     "test:watch": "vitest",
     "typecheck": "pnpm -r typecheck",
     "gen:conformance": "pnpm --filter chanx-conformance gen && pnpm --filter chanx-conformance-js gen",
+    "docs:dev": "pnpm --filter chanx-docs dev",
+    "docs:build": "pnpm --filter chanx-docs build",
     "check:conformance": "pnpm gen:conformance && git diff --exit-code conformance/generated conformance-js/generated",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

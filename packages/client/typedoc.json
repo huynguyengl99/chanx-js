@@ -1,0 +1,18 @@
+{
+  "entryPoints": [
+    "src/index.ts",
+    "src/react/index.ts",
+    "src/vue/index.ts",
+    "src/svelte/index.ts",
+    "src/solid/index.ts"
+  ],
+  "tsconfig": "tsconfig.json",
+  "intentionallyNotExported": [
+    "TopicHost",
+    "ChannelSpec",
+    "TopicSpec",
+    "MaybeRef",
+    "ReactiveConnectOptions",
+    "SharedSocket"
+  ]
+}

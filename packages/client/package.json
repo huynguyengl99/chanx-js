@@ -4,6 +4,13 @@
   "description": "Type-safe WebSocket client for chanx AsyncAPI schemas, with topic multiplexing. React, Vue, Svelte and Solid bindings.",
   "license": "MIT",
   "author": "Huy Nguyen",
+  "homepage": "https://huynguyengl99.github.io/chanx-js/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/huynguyengl99/chanx-js.git",
+    "directory": "packages/client"
+  },
+  "bugs": "https://github.com/huynguyengl99/chanx-js/issues",
   "type": "module",
   "sideEffects": false,
   "files": [

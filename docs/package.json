@@ -1,0 +1,17 @@
+{
+  "name": "chanx-docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "api": "typedoc",
+    "dev": "pnpm api && vitepress dev",
+    "build": "pnpm api && vitepress build",
+    "preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "typedoc": "^0.28.20",
+    "typedoc-plugin-markdown": "^4.13.1",
+    "typedoc-vitepress-theme": "^1.1.4",
+    "vitepress": "^1.6.4"
+  }
+}

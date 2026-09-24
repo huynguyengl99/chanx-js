@@ -2,3 +2,4 @@ packages:
   - packages/*
   - conformance
   - conformance-js
+  - docs

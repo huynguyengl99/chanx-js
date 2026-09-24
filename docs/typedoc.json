@@ -1,0 +1,16 @@
+{
+  "$schema": "https://typedoc.org/schema.json",
+  "name": "API reference",
+  "entryPointStrategy": "packages",
+  "entryPoints": ["../packages/client", "../packages/codegen"],
+  "plugin": ["typedoc-plugin-markdown", "typedoc-vitepress-theme"],
+  "out": "./api",
+  "docsRoot": ".",
+  "readme": "none",
+  "hidePageHeader": true,
+  "excludePrivate": true,
+  "excludeInternal": true,
+  "useCodeBlocks": true,
+  "parametersFormat": "table",
+  "treatWarningsAsErrors": true
+}
