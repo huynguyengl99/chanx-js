@@ -29,6 +29,26 @@ export type {
   Validators,
 } from './core/descriptor';
 
+export {
+  createChannelController,
+  createTopicController,
+  createTopicsController,
+} from './core/controller';
+export type {
+  BufferMode,
+  ChannelController,
+  ChannelSnapshot,
+  ControllerOptions,
+  TopicController,
+  TopicControllerOptions,
+  TopicSnapshot,
+  TopicsController,
+  TopicsControllerOptions,
+  TopicsSnapshot,
+} from './core/controller';
+
+export type { ActionHandler, HandlerMap } from './core/batch';
+
 export type { MessageStream, StreamOptions } from './core/stream';
 
 export { TopicHandle } from './core/topic';
