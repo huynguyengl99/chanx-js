@@ -1,0 +1,5 @@
+dist/
+node_modules/
+coverage/
+packages/*/tests/__fixtures__/generated/
+pnpm-lock.yaml
