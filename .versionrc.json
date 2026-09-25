@@ -1,0 +1,12 @@
+{
+  "packageFiles": [{ "filename": "packages/client/package.json", "type": "json" }],
+  "bumpFiles": [
+    { "filename": "packages/client/package.json", "type": "json" },
+    { "filename": "packages/codegen/package.json", "type": "json" }
+  ],
+  "tagPrefix": "v",
+  "sign": true,
+  "scripts": {
+    "postchangelog": "prettier --write CHANGELOG.md"
+  }
+}

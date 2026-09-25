@@ -1,0 +1,76 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  publish:
+    # Only the commit `pnpm release` makes; a stray tag publishes nothing.
+    if: "startsWith(github.event.head_commit.message, 'chore(release): ')"
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    environment: deploy
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      # Trusted publishing needs npm 11.5.1 or later.
+      - run: npm install -g npm@11
+      - run: pnpm install --frozen-lockfile
+
+      - name: Check the tag matches both package versions
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          for dir in client codegen; do
+            version=$(node -p "require('./packages/$dir/package.json').version")
+            if [ "$version" != "$tag" ]; then
+              echo "::error::packages/$dir is $version but the tag is $GITHUB_REF_NAME"
+              exit 1
+            fi
+          done
+
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+
+      # Trusted publishing (OIDC) when configured on npm; NPM_TOKEN only bootstraps the
+      # very first release, before the packages exist to attach a trusted publisher to.
+      - name: Publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          for dir in client codegen; do
+            pkg=$(node -p "require('./packages/$dir/package.json').name")
+            version=$(node -p "require('./packages/$dir/package.json').version")
+            if npm view "$pkg@$version" version > /dev/null 2>&1; then
+              echo "$pkg@$version is already on npm; skipping"
+              continue
+            fi
+            (cd "packages/$dir" && npm publish --provenance --access public)
+          done
+
+  release:
+    needs: publish
+    name: Release on GitHub
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+      # The release commit puts this version's section at the top of CHANGELOG.md.
+      - name: Extract this version's changelog
+        run: awk '/^## / { n++; if (n == 2) exit; next } n == 1' CHANGELOG.md > release-notes.md
+      - uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ github.ref_name }}
+          body_path: release-notes.md

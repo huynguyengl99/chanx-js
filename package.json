@@ -2,6 +2,10 @@
   "name": "chanx-js",
   "private": true,
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/huynguyengl99/chanx-js.git"
+  },
   "packageManager": "pnpm@10.13.1",
   "scripts": {
     "build": "pnpm -r build",
@@ -16,7 +20,8 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
-    "check": "pnpm lint && pnpm format && pnpm typecheck && pnpm test"
+    "check": "pnpm lint && pnpm format && pnpm typecheck && pnpm test",
+    "release": "commit-and-tag-version"
   },
   "devDependencies": {
     "@eslint/js": "^9.31.0",
@@ -26,6 +31,7 @@
     "@types/react-dom": "^19.3.0",
     "@types/ws": "^8.18.1",
     "@vue/test-utils": "^2.5.1",
+    "commit-and-tag-version": "^13.2.1",
     "eslint": "^9.31.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-react-hooks": "^7.1.1",

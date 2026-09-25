@@ -278,6 +278,18 @@ pnpm docs:dev           # docs site with live reload
 pnpm docs:build         # the site as GitHub Pages serves it
 ```
 
+### Releasing
+
+```bash
+pnpm release              # version from the commits, CHANGELOG.md, signed commit and tag
+git push origin main      # let CI check it
+git push origin v0.1.1    # the tag publishes to npm and cuts a GitHub release
+```
+
+Below 1.0, `feat` bumps the patch version; use `pnpm release --release-as minor` for a
+minor one. The very first release is `pnpm release --first-release`, which tags the
+current version instead of bumping it.
+
 See the [design notes](https://huynguyengl99.github.io/chanx-js/design) for the protocol,
 the reference-counting rules, and why this does not wrap react-use-websocket.
 
