@@ -8,7 +8,7 @@ export { generate } from './generate';
 export type { GenerateOptions, GenerateResult } from './generate';
 export { loadSchema } from './loader';
 export { camelCase, pascalCase } from './naming';
-export { renderImports, resolveReuse } from './reuse';
+export { renderImports, renderReexports, resolveReuse } from './reuse';
 export type { ReuseOptions, ReuseResolution } from './reuse';
 export type {
   AsyncAPIDocument,

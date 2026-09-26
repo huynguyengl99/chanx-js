@@ -132,3 +132,13 @@ export function renderImports(imports: Map<string, Set<string>>): string {
     });
   return `${lines.join('\n')}\n\n`;
 }
+
+/**
+ * Re-export reused types, so every schema name is available from the output (channels
+ * import messages from it) and an import nothing generated references still counts as
+ * used under `noUnusedLocals`.
+ */
+export function renderReexports(imports: Map<string, Set<string>>): string {
+  const names = [...imports.values()].flatMap((set) => [...set]).sort();
+  return names.length ? `export type { ${names.join(', ')} };\n\n` : '';
+}

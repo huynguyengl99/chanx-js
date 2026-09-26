@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
+import { Project } from 'ts-morph';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 import { analyze } from '../src/analyze';
@@ -334,6 +335,34 @@ describe('type reuse', () => {
     expect(schemas).not.toContain('export interface PostPayload');
     // Still referenced by the messages that carry it.
     expect(schemas).toContain('PostPayload');
+  });
+
+  it('re-exports reused types, so the output compiles under noUnusedLocals', async () => {
+    const document = await loadSchema(join(fixtures, 'fastapi-asyncapi.json'));
+    const outDir = await mkdtemp(join(tmpdir(), 'chanx-codegen-'));
+    // Reusing a message and its payload leaves nothing generated that references
+    // either, yet both are imported.
+    await generate(document, {
+      outDir,
+      format: false,
+      reuseMap: { PostedMessage: 'backend', PostPayload: 'backend' },
+    });
+
+    const project = new Project({
+      useInMemoryFileSystem: true,
+      compilerOptions: { strict: true, noUnusedLocals: true, noEmit: true },
+    });
+    project.createSourceFile(
+      '/schemas.ts',
+      await readFile(join(outDir, 'schemas.ts'), 'utf-8'),
+    );
+    project.createSourceFile(
+      '/backend.d.ts',
+      "declare module 'backend' { export type PostPayload = { body: string }; export type PostedMessage = { action: 'posted'; payload: PostPayload } }",
+    );
+
+    const errors = project.getPreEmitDiagnostics().map((d) => d.getMessageText());
+    expect(errors).toEqual([]);
   });
 
   it('emits assertions that a reused type still matches the schema', async () => {
