@@ -1,6 +1,6 @@
 {
   "name": "@chanx-js/codegen",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Generate TypeScript channel descriptors and message types from a chanx AsyncAPI 3 schema.",
   "license": "MIT",
   "author": "Huy Nguyen",
