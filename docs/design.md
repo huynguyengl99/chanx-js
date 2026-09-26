@@ -27,7 +27,7 @@ So chanx-js takes the design, not the dependency, and adds what that library can
 
 ## When to share a socket
 
-Sharing is on by default only for channels that carry topics. There, frames are routed per topic and requests matched by `ref`, so consumers stay isolated, and multiplexing is the reason topics exist. A shared plain socket is one inbox, where a reply to one consumer's `send()` reaches all of them: a silent correctness bug, so plain channels get a socket each unless they opt in. It is the same split as Socket.IO, which shares its multiplexed connection, and react-use-websocket, which defaults `share` to `false`. The remaining cost of sharing topics is the second subscriber's initial state, listed under open questions.
+Sharing is on by default only for channels that carry topics. There, frames are routed per topic and requests matched by `ref`, so consumers stay isolated, and multiplexing is the reason topics exist. A shared plain socket is one inbox, where a reply to one consumer's `send()` reaches all of them: a silent correctness bug, so plain channels get a socket each unless they opt in. It is the same split as Socket.IO, which shares its multiplexed connection, and react-use-websocket, which defaults `share` to `false`. The remaining cost of sharing topics is the second subscriber's initial state; see [State pushed on join](./guide/topics#state-pushed-on-join).
 
 ## Errors in user code
 
@@ -58,11 +58,3 @@ The client relies on these server behaviours. Each was checked against a real ch
 ## Conformance
 
 `conformance/` and `conformance-js/` generate clients from a committed copy of chanx's sandbox schema, as TypeScript and JavaScript output, and compile a consumer of each. `@ts-expect-error` lines assert what must not compile: sending an inbound-only action, omitting an address param, a non-exhaustive `switch`. CI regenerates both and fails on any diff.
-
-## Open questions
-
-- **The second subscriber's initial state.** A server-side fix would send `on_subscribe`'s state again for a duplicate subscribe, carrying that request's `ref` so only the new consumer receives it. That needs a `Topic` API separating state from side effects.
-- **Exhaustive `on` maps.** Handlers are partial today, with `onUnhandled` as the catch-all. Exhaustive by default, with an explicit ignore list, would catch "the server added an action and the client silently drops it".
-- **`seq`** is stripped but not yet used for ordering or deduplication across a reconnect.
-- **Reactive params** reconnect on change only in the Vue binding; React keys off serialised params, and Svelte and Solid expect a fresh call.
-- **A react-use-websocket compatibility adapter** would let an existing app migrate hook by hook.
