@@ -6,7 +6,8 @@
   "description": "Generated from the real chanx sandbox schema, then compiled. Proves the emitted code narrows against the runtime, and `git diff --exit-code` catches drift.",
   "scripts": {
     "gen": "tsx ../packages/codegen/src/cli.ts ../packages/codegen/tests/__fixtures__/fastapi-asyncapi.json -o generated --validation zod",
-    "typecheck": "tsc -p tsconfig.json"
+    "typecheck": "tsc -p tsconfig.json",
+    "typecheck:dist": "tsc -p tsconfig.dist.json"
   },
   "dependencies": {
     "@chanx-js/client": "workspace:*"

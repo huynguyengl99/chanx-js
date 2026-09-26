@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@chanx-js/client": ["../packages/client/dist/index.d.mts"],
+      "@chanx-js/client/react": ["../packages/client/dist/react/index.d.mts"]
+    }
+  }
+}

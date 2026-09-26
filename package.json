@@ -15,7 +15,7 @@
     "gen:conformance": "pnpm --filter chanx-conformance gen && pnpm --filter chanx-conformance-js gen",
     "docs:dev": "pnpm --filter chanx-docs dev",
     "docs:build": "pnpm --filter chanx-docs build",
-    "check:conformance": "pnpm gen:conformance && git diff --exit-code conformance/generated conformance-js/generated",
+    "check:conformance": "pnpm gen:conformance && git diff --exit-code conformance/generated conformance-js/generated && pnpm --filter @chanx-js/client build && pnpm --filter chanx-conformance --filter chanx-conformance-js typecheck:dist",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --check .",

@@ -6,7 +6,8 @@
   "description": "A plain-JavaScript consumer of the generated client, type-checked with checkJs. Proves `--emit js` gives a JS project the same narrowing a TS project gets.",
   "scripts": {
     "gen": "tsx ../packages/codegen/src/cli.ts ../packages/codegen/tests/__fixtures__/fastapi-asyncapi.json -o generated --emit js",
-    "typecheck": "tsc -p jsconfig.json"
+    "typecheck": "tsc -p jsconfig.json",
+    "typecheck:dist": "tsc -p jsconfig.dist.json"
   },
   "dependencies": {
     "@chanx-js/client": "workspace:*"

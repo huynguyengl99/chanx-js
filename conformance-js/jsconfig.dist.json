@@ -1,0 +1,8 @@
+{
+  "extends": "./jsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@chanx-js/client": ["../packages/client/dist/index.d.mts"]
+    }
+  }
+}

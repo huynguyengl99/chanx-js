@@ -42,6 +42,7 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
+      - run: pnpm check:conformance
 
       # Trusted publishing (OIDC) when configured on npm; NPM_TOKEN only bootstraps the
       # very first release, before the packages exist to attach a trusted publisher to.
