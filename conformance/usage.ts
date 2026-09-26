@@ -62,6 +62,11 @@ const hub = client.connect(topicHub);
 const room = hub.topic(topicHub.topics.roomTopic.with({ room_name: 'lobby' }));
 room.send({ action: 'post', payload: { body: 'hello' } });
 room.on('posted', (message) => console.log(message.payload.body));
+// The envelope rides alongside: `seq` orders a topic's events.
+room.on('posted', (_message, { seq }) => {
+  const order: number | undefined = seq;
+  void order;
+});
 
 // @ts-expect-error `posted` is inbound only.
 room.send({ action: 'posted', payload: { body: 'no' } });

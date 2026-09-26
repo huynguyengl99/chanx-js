@@ -243,7 +243,7 @@ export class SharedSocket {
       this.attempt = 0;
       this.setStatus('open');
       this.startHeartbeat();
-      for (const listener of [...this.openListeners]) safely(listener, undefined);
+      for (const listener of [...this.openListeners]) safely(listener);
       const pending = this.queue;
       this.queue = [];
       for (const data of pending) socket.send(data);
@@ -362,7 +362,7 @@ export class SharedSocket {
     this.queue = [];
     this.topicClaims.clear();
     this.setStatus('closed');
-    for (const listener of [...this.terminateListeners]) safely(listener, undefined);
+    for (const listener of [...this.terminateListeners]) safely(listener);
     this.terminateListeners.clear();
     this.frameListeners.clear();
     this.statusListeners.clear();

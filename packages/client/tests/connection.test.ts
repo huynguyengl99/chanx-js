@@ -736,7 +736,10 @@ describe('inbound validation', () => {
 
     FakeSocket.last.receive({ version: 1, action: 'pong', payload: null, extra: 1 });
 
-    expect(seen).toHaveBeenCalledWith({ action: 'pong', payload: null, extra: 1 });
+    expect(seen).toHaveBeenCalledWith(
+      { action: 'pong', payload: null, extra: 1 },
+      { version: 1 },
+    );
   });
 
   it('reports and drops a message that fails validation', () => {

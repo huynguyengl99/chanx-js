@@ -69,6 +69,17 @@ const { subscribed, lastMessage, sendTopic } = useTopics(topicHub, {
 - `sendTopic(topic, message)` sends on a joined topic by its resolved name. For a send typed to one topic, use the handle from `handles`, or `useTopic`.
 - Changing the list rejoins; the same list on a re-render does not.
 
+## Ordering with `seq`
+
+A topic may number its events on the envelope, as chanx-kit's ag_ui kit does per run, so a client joining mid-run can apply a replay that overlaps live events without duplicates. Handlers get it as the second argument, and buffered messages carry it next to `topic`:
+
+```ts
+handle.on('ag_ui_event', (message, { seq }) => apply(seq, message.payload));
+
+const { lastMessage } = useTopic(hub, hub.topics.agUi.with({ thread }));
+lastMessage?.seq;
+```
+
 ## Leaving
 
 | How                    | Effect on this consumer | Effect on others sharing the socket |

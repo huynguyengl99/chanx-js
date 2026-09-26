@@ -123,7 +123,10 @@ describe('onUnhandled', () => {
 
     receive({ version: 1, action: 'pong', payload: null });
 
-    expect(onUnhandled).toHaveBeenCalledWith({ action: 'pong', payload: null });
+    expect(onUnhandled).toHaveBeenCalledWith(
+      { action: 'pong', payload: null },
+      { version: 1 },
+    );
   });
 
   it('fires for every message without a handler when buffer is none', () => {
@@ -147,24 +150,29 @@ describe('onUnhandled', () => {
 });
 
 describe('on handlers', () => {
-  it('routes by action with the envelope stripped', () => {
+  it('routes by action with the envelope stripped and passed alongside', () => {
     const onPosted = vi.fn();
     start({ on: { posted: onPosted } });
     receive({ version: 1, seq: 4, action: 'posted', payload: { body: 'hi' } });
-    expect(onPosted).toHaveBeenCalledWith({ action: 'posted', payload: { body: 'hi' } });
+    expect(onPosted).toHaveBeenCalledWith(
+      { action: 'posted', payload: { body: 'hi' } },
+      { version: 1, seq: 4 },
+    );
   });
 
   it('coalesces a batched action into one call', async () => {
     const handler = vi.fn();
     start({ on: { posted: { batch: 1, handler } } });
 
-    receive({ version: 1, action: 'posted', payload: { body: 'a' } });
-    receive({ version: 1, action: 'posted', payload: { body: 'b' } });
-    receive({ version: 1, action: 'posted', payload: { body: 'c' } });
+    receive({ version: 1, seq: 1, action: 'posted', payload: { body: 'a' } });
+    receive({ version: 1, seq: 2, action: 'posted', payload: { body: 'b' } });
+    receive({ version: 1, seq: 3, action: 'posted', payload: { body: 'c' } });
 
     expect(handler).not.toHaveBeenCalled();
     await vi.waitFor(() => expect(handler).toHaveBeenCalledOnce());
-    expect(handler.mock.calls[0]?.[0]).toHaveLength(3);
+    const [messages, envelopes] = handler.mock.calls[0] ?? [];
+    expect(messages).toHaveLength(3);
+    expect(envelopes.map((envelope: { seq: number }) => envelope.seq)).toEqual([1, 2, 3]);
   });
 
   it('picks up handlers replaced through setOptions', () => {
@@ -264,6 +272,31 @@ describe('topics controller', () => {
 
     const [message] = controller.getSnapshot().messages;
     expect(message).toMatchObject({ action: 'posted', topic: 'room:lobby' });
+    expect(message).not.toHaveProperty('seq');
+  });
+
+  it('carries a frame’s seq on the buffered message', async () => {
+    const controller = createTopicsController(makeClient(), hub, {
+      topics: [roomTopic.with({ room_name: 'lobby' })],
+    });
+    controller.start();
+    accept();
+    ackLast();
+
+    receive({
+      version: 1,
+      topic: 'room:lobby',
+      seq: 5,
+      action: 'posted',
+      payload: { body: 'hi' },
+    });
+
+    expect(controller.getSnapshot().lastMessage).toEqual({
+      action: 'posted',
+      payload: { body: 'hi' },
+      topic: 'room:lobby',
+      seq: 5,
+    });
   });
 
   it('reports a rejected subscription', async () => {

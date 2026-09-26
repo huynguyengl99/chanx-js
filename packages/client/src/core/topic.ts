@@ -1,7 +1,7 @@
 import type { TopicDescriptor, TopicRef, Validator } from './descriptor';
 import { ActionEmitter } from './emitter';
-import type { ChanxMessage, RawFrame } from './protocol';
-import { isFrameworkAction, stripEnvelope } from './protocol';
+import type { ChanxMessage, Envelope, RawFrame } from './protocol';
+import { envelopeOf, isFrameworkAction, stripEnvelope } from './protocol';
 import type { MessageStream, StreamOptions } from './stream';
 import { firstMessage, trackStream } from './stream';
 import { reportError, safely } from './report';
@@ -153,18 +153,19 @@ export class TopicHandle<
     return this.host.requestTopic(this.topic, message, options.timeout);
   }
 
+  /** `envelope.seq` orders a topic's events, e.g. a replay overlapping live ones. */
   on<A extends ToClient['action']>(
     action: A,
-    handler: (message: Extract<ToClient, { action: A }>) => void,
+    handler: (message: Extract<ToClient, { action: A }>, envelope: Envelope) => void,
   ): () => void {
     return this.emitter.on(action, handler);
   }
 
-  onAny(handler: (message: ToClient) => void): () => void {
+  onAny(handler: (message: ToClient, envelope: Envelope) => void): () => void {
     return this.emitter.onAny(handler);
   }
 
-  onUnhandled(handler: (message: ToClient) => void): () => void {
+  onUnhandled(handler: (message: ToClient, envelope: Envelope) => void): () => void {
     return this.emitter.onUnhandled(handler);
   }
 
@@ -226,6 +227,6 @@ export class TopicHandle<
       reportError(error);
       return;
     }
-    this.emitter.emit(message as ToClient);
+    this.emitter.emit(message as ToClient, envelopeOf(frame));
   }
 }

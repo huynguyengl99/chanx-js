@@ -11,7 +11,7 @@ import type {
   TopicRef,
   TopicRefOf,
 } from './descriptor';
-import type { ChanxErrorFrame, ChanxMessage } from './protocol';
+import type { ChanxErrorFrame, ChanxMessage, Envelope } from './protocol';
 import type { SocketStatus } from './socket';
 import type { TopicHandle } from './topic';
 
@@ -39,7 +39,7 @@ export interface ControllerOptions<
    * Messages nothing took: no `on` handler, and kept out of the buffer by `only` or
    * `buffer: 'none'`.
    */
-  onUnhandled?: (message: ToClient) => void;
+  onUnhandled?: (message: ToClient, envelope: Envelope) => void;
 }
 
 const CONTROLLER_KEYS = [
@@ -151,19 +151,19 @@ export function createChannelController<D extends ChannelDescriptor<any, any, an
     for (const listener of [...listeners]) listener();
   };
 
-  const handle = (message: ToClient) => {
+  const handle = (message: ToClient, envelope: Envelope) => {
     const handler = options.on?.[message.action as ToClient['action']];
     if (typeof handler === 'function') {
-      handler(message as never);
+      handler(message as never, envelope);
     } else if (handler) {
-      queue?.push(message.action, message, handler.batch);
+      queue?.push(message.action, message, envelope, handler.batch);
     }
 
     const mode = options.buffer ?? 'latest';
     const buffered =
       mode !== 'none' && (!options.only || options.only.includes(message.action));
     if (!buffered) {
-      if (!handler) options.onUnhandled?.(message);
+      if (!handler) options.onUnhandled?.(message, envelope);
       return;
     }
     if (mode === 'latest') publish({ lastMessage: message });
@@ -215,9 +215,11 @@ export function createChannelController<D extends ChannelDescriptor<any, any, an
       ) as ChannelConnection<ToServer, ToClient>;
       connection = opened;
 
-      queue = new BatchQueue((action, batched) => {
+      queue = new BatchQueue((action, batched, envelopes) => {
         const handler = options.on?.[action as ToClient['action']];
-        if (handler && typeof handler === 'object') handler.handler(batched as never);
+        if (handler && typeof handler === 'object') {
+          handler.handler(batched as never, envelopes);
+        }
       });
 
       disposers = [
@@ -375,10 +377,10 @@ export function createTopicsController<
       const connection = channel.getConnection();
       if (!connection) return;
 
-      queue = new BatchQueue((action, batched) => {
+      queue = new BatchQueue((action, batched, envelopes) => {
         const handler = handlerFor(action);
         if (handler && typeof handler === 'object')
-          handler.handler(batched as ChanxMessage[]);
+          handler.handler(batched as ChanxMessage[], envelopes);
       });
 
       const handles: Record<string, TopicHandle> = {};
@@ -405,14 +407,19 @@ export function createTopicsController<
           }),
         );
         topicDisposers.push(
-          handle.onAny((message: ChanxMessage) => {
+          handle.onAny((message: ChanxMessage, envelope: Envelope) => {
             const handler = handlerFor(message.action);
-            if (typeof handler === 'function') handler(message);
-            else if (handler) queue?.push(message.action, message, handler.batch);
+            if (typeof handler === 'function') handler(message, envelope);
+            else if (handler)
+              queue?.push(message.action, message, envelope, handler.batch);
 
             const mode = options.buffer ?? 'latest';
             if (mode === 'none') return;
-            const withTopic = { ...message, topic: handle.topic } as TopicMessage<Ref>;
+            const withTopic = {
+              ...message,
+              topic: handle.topic,
+              ...(envelope.seq === undefined ? {} : { seq: envelope.seq }),
+            } as TopicMessage<Ref>;
             if (mode === 'latest') publish({ lastMessage: withTopic });
             else publish({ messages: [...snapshot.messages, withTopic] });
           }),

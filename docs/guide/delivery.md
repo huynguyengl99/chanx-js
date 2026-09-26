@@ -68,6 +68,8 @@ on: {
 
 ## Mixing them
 
+A batched handler also receives the envelopes, `(messages, envelopes)`, with `envelopes[i]` belonging to `messages[i]`.
+
 Modes combine: `on` for the one streaming action, `lastMessage` for everything else. `only` restricts which actions reach the buffer, without affecting `on`:
 
 ```tsx

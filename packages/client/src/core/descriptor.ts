@@ -180,6 +180,6 @@ export type TopicRefOf<D> = {
     : never;
 }[keyof TopicsOf<D>];
 
-/** A message delivered on one of the refs' topics, tagged with the topic it came on. */
+/** A message on one of the refs' topics, tagged with its topic and, if sent, its `seq`. */
 export type TopicMessage<R> =
-  R extends TopicRef<any, infer TC, any> ? TC & { topic: string } : never;
+  R extends TopicRef<any, infer TC, any> ? TC & { topic: string; seq?: number } : never;

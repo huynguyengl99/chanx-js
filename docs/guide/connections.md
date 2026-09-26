@@ -55,7 +55,7 @@ connection.onUnhandled((message) => {}); // messages no `on` handler claimed
 connection.onError((error) => {}); // the server's `error` frames
 ```
 
-Each returns a function that removes the handler.
+Each returns a function that removes the handler. Handlers also receive the frame's envelope, `(message, envelope)`, for the routing fields a message leaves out: `seq`, `ref` and `topic`.
 
 A handler that throws does not stop the others, or other consumers of a shared socket, from receiving the message. The error is reported the way a throwing DOM event listener's is: through `reportError` in a browser (the console and `window.onerror`), and as an uncaught exception in Node.
 

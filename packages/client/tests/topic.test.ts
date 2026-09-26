@@ -71,7 +71,7 @@ describe('subscribing', () => {
 });
 
 describe('routing', () => {
-  it('delivers a topic frame to its handle with the envelope stripped', async () => {
+  it('delivers a topic frame with the envelope stripped and passed alongside', async () => {
     const connection = connect();
     const handle = connection.topic(roomTopic.with({ room_name: 'lobby' }));
     const onPosted = vi.fn();
@@ -85,7 +85,10 @@ describe('routing', () => {
       payload: { body: 'hi' },
     });
 
-    expect(onPosted).toHaveBeenCalledWith({ action: 'posted', payload: { body: 'hi' } });
+    expect(onPosted).toHaveBeenCalledWith(
+      { action: 'posted', payload: { body: 'hi' } },
+      { version: 1, topic: 'room:lobby', seq: 7 },
+    );
   });
 
   it('does not leak one topic’s frames into another', () => {
@@ -254,5 +257,27 @@ describe('failed resubscribe', () => {
 
     await vi.waitFor(() => expect(failed).toHaveBeenCalledOnce());
     expect(handle.subscribed).toBe(false);
+  });
+});
+
+describe('sequence numbers', () => {
+  it('passes each frame’s seq, so a replay overlapping live events can be ordered', () => {
+    const connection = connect();
+    const handle = connection.topic(roomTopic.with({ room_name: 'lobby' }));
+    const seqs: Array<number | undefined> = [];
+    handle.on('posted', (_message, { seq }) => seqs.push(seq));
+
+    const frame = (seq?: number) => ({
+      version: 1,
+      topic: 'room:lobby',
+      ...(seq === undefined ? {} : { seq }),
+      action: 'posted',
+      payload: { body: 'x' },
+    });
+    // Replay of the run so far (1, 2), overlapping the live stream (2, 3), then an
+    // event outside any run.
+    for (const seq of [1, 2, 2, 3, undefined]) FakeSocket.last.receive(frame(seq));
+
+    expect(seqs).toEqual([1, 2, 2, 3, undefined]);
   });
 });

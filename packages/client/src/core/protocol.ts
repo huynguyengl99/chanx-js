@@ -51,6 +51,15 @@ export function stripEnvelope(frame: RawFrame): ChanxMessage {
   return message as unknown as ChanxMessage;
 }
 
+/** The envelope fields a frame carries, for handlers that need `seq` or `ref`. */
+export function envelopeOf(frame: RawFrame): Envelope {
+  const envelope: Envelope = {};
+  for (const key of ENVELOPE_FIELDS) {
+    if (frame[key] !== undefined) (envelope as Record<string, unknown>)[key] = frame[key];
+  }
+  return envelope;
+}
+
 export function withEnvelope(
   message: object,
   envelope: { topic?: string; ref?: string },

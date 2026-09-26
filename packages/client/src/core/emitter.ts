@@ -1,7 +1,7 @@
-import type { ChanxMessage } from './protocol';
+import type { ChanxMessage, Envelope } from './protocol';
 import { safely } from './report';
 
-type Handler<T> = (message: T) => void;
+type Handler<T> = (message: T, envelope: Envelope) => void;
 
 /** Routes messages to handlers registered per `action`, with catch-alls. */
 export class ActionEmitter<T extends ChanxMessage> {
@@ -36,14 +36,15 @@ export class ActionEmitter<T extends ChanxMessage> {
     return () => this.unhandledHandlers.delete(handler);
   }
 
-  emit(message: T): boolean {
+  emit(message: T, envelope: Envelope = {}): boolean {
     const handlers = this.byAction.get(message.action);
-    if (handlers) for (const handler of [...handlers]) safely(handler, message);
-    for (const handler of [...this.anyHandlers]) safely(handler, message);
+    if (handlers) for (const handler of [...handlers]) safely(handler, message, envelope);
+    for (const handler of [...this.anyHandlers]) safely(handler, message, envelope);
 
     const claimed = Boolean(handlers?.size) || this.anyHandlers.size > 0;
     if (!claimed) {
-      for (const handler of [...this.unhandledHandlers]) safely(handler, message);
+      for (const handler of [...this.unhandledHandlers])
+        safely(handler, message, envelope);
     }
     return claimed;
   }

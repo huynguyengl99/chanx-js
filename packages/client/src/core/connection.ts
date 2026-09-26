@@ -1,8 +1,9 @@
 import type { ChannelDescriptor, TopicRef, Validator } from './descriptor';
 import { ActionEmitter } from './emitter';
-import type { ChanxErrorFrame, ChanxMessage, RawFrame } from './protocol';
+import type { ChanxErrorFrame, ChanxMessage, Envelope, RawFrame } from './protocol';
 import {
   COMPLETE_ACTIONS,
+  envelopeOf,
   ERROR_ACTION,
   isFrameworkAction,
   stripEnvelope,
@@ -138,19 +139,20 @@ export class ChannelConnection<
     return this.stream();
   }
 
+  /** `envelope` holds the frame's routing fields, such as a broadcast's `seq`. */
   on<A extends ToClient['action']>(
     action: A,
-    handler: (message: Extract<ToClient, { action: A }>) => void,
+    handler: (message: Extract<ToClient, { action: A }>, envelope: Envelope) => void,
   ): () => void {
     return this.emitter.on(action, handler);
   }
 
-  onAny(handler: (message: ToClient) => void): () => void {
+  onAny(handler: (message: ToClient, envelope: Envelope) => void): () => void {
     return this.emitter.onAny(handler);
   }
 
   /** Messages that arrived with no handler for their action. */
-  onUnhandled(handler: (message: ToClient) => void): () => void {
+  onUnhandled(handler: (message: ToClient, envelope: Envelope) => void): () => void {
     return this.emitter.onUnhandled(handler);
   }
 
@@ -337,7 +339,7 @@ export class ChannelConnection<
       reportError(error);
       return;
     }
-    this.emitter.emit(message as ToClient);
+    this.emitter.emit(message as ToClient, envelopeOf(frame));
   }
 
   private absorb(message: ChanxMessage): void {

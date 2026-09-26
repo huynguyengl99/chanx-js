@@ -1,12 +1,13 @@
-import type { ChanxMessage } from '../core/protocol';
+import type { ChanxMessage, Envelope } from '../core/protocol';
 
 /** A handler, or a handler that receives frames coalesced over a window. */
 export type ActionHandler<M> =
-  | ((message: M) => void)
+  | ((message: M, envelope: Envelope) => void)
   | {
       /** `'raf'` coalesces per animation frame; a number coalesces per that many ms. */
       batch: 'raf' | number;
-      handler: (messages: M[]) => void;
+      /** `envelopes[i]` belongs to `messages[i]`. */
+      handler: (messages: M[], envelopes: Envelope[]) => void;
     };
 
 export type HandlerMap<ToClient extends ChanxMessage> = {
@@ -22,29 +23,42 @@ type Flush = () => void;
  * so cross-tick coalescing is still needed for a high-rate action.
  */
 export class BatchQueue {
-  private readonly pending = new Map<string, unknown[]>();
+  private readonly pending = new Map<
+    string,
+    { messages: unknown[]; envelopes: Envelope[] }
+  >();
   private readonly timers = new Map<
     string,
     { kind: 'raf'; id: number } | { kind: 'timeout'; id: ReturnType<typeof setTimeout> }
   >();
 
   constructor(
-    private readonly flushAction: (action: string, messages: unknown[]) => void,
+    private readonly flushAction: (
+      action: string,
+      messages: unknown[],
+      envelopes: Envelope[],
+    ) => void,
   ) {}
 
-  push(action: string, message: unknown, window: 'raf' | number): void {
+  push(
+    action: string,
+    message: unknown,
+    envelope: Envelope,
+    window: 'raf' | number,
+  ): void {
     const queued = this.pending.get(action);
     if (queued) {
-      queued.push(message);
+      queued.messages.push(message);
+      queued.envelopes.push(envelope);
       return;
     }
-    this.pending.set(action, [message]);
+    this.pending.set(action, { messages: [message], envelopes: [envelope] });
 
     const flush: Flush = () => {
       this.timers.delete(action);
-      const messages = this.pending.get(action);
+      const queued = this.pending.get(action);
       this.pending.delete(action);
-      if (messages && messages.length > 0) this.flushAction(action, messages);
+      if (queued) this.flushAction(action, queued.messages, queued.envelopes);
     };
 
     if (window === 'raf' && typeof requestAnimationFrame === 'function') {

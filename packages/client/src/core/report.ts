@@ -18,9 +18,12 @@ export function reportError(error: unknown): void {
 }
 
 /** Call a listener, reporting rather than propagating what it throws. */
-export function safely<T>(listener: (value: T) => void, value: T): void {
+export function safely<A extends unknown[]>(
+  listener: (...args: A) => void,
+  ...args: A
+): void {
   try {
-    listener(value);
+    listener(...args);
   } catch (error) {
     reportError(error);
   }
