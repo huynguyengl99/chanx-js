@@ -88,6 +88,47 @@ describe('analysis of the chanx fastapi sandbox', () => {
     expect(standalone?.topics).toHaveLength(1);
   });
 
+  it('names a hosted topic’s own connection after its host, with no messages', async () => {
+    // Shaped like a consumer that declares only a topic: chanx then emits the topic
+    // channel alone, named `<host>_<topic>`.
+    const hosted: AsyncAPIDocument = {
+      asyncapi: '3.0.0',
+      channels: {
+        agent_thread_topic: {
+          address: '/ws/agent',
+          title: 'agent_thread_topic',
+          'x-topic': { name: 'thread_topic', pattern: 'thread:{id}' },
+        },
+      },
+      operations: {
+        run: {
+          action: 'receive',
+          channel: { $ref: '#/channels/agent_thread_topic' },
+          messages: [{ $ref: '#/components/messages/run' }],
+        },
+      },
+      components: {
+        messages: { run: { payload: { $ref: '#/components/schemas/RunMessage' } } },
+        schemas: {
+          RunMessage: { type: 'object', properties: { action: { const: 'run' } } },
+        },
+      },
+    };
+
+    const [agent] = analyze(hosted);
+    expect(agent).toMatchObject({ name: 'agent', toServer: [], toClient: [] });
+    expect(agent?.topics[0]?.toServer).toEqual(['RunMessage']);
+
+    const outDir = await mkdtemp(join(tmpdir(), 'chanx-codegen-'));
+    await generate(hosted, { outDir, format: false });
+    const channels = await readFile(join(outDir, 'channels.ts'), 'utf-8');
+    expect(channels).toContain('export type AgentToServer = never;');
+    expect(channels).toContain(
+      'export const agent = defineChannel<AgentToServer, AgentToClient>()',
+    );
+    expect(channels).toContain('threadTopic: defineTopic<AgentThreadTopicToServer');
+  });
+
   it('names directions from the client’s point of view', () => {
     const chat = analyze(document).find((connection) => connection.name === 'chat');
     expect(chat?.toServer).toContain('ChatMessage');

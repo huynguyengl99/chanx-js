@@ -51,7 +51,7 @@ export const topicHub = defineChannel<TopicHubToServer, TopicHubToClient>()({
 });
 ```
 
-A topic channel whose address has no plain channel of its own is emitted as a connection that carries itself as its only topic.
+When a consumer declares only topics, it has no plain channel. Its topics still get a connection named after the consumer, carrying no messages of its own: `agent.topics.threadTopic`. A topic served on its own route is emitted as a connection that carries itself as its only topic.
 
 ### The `action` discriminant
 

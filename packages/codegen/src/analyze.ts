@@ -80,11 +80,22 @@ function describe(
 }
 
 /**
+ * The consumer hosting a topic channel, from chanx's `<host>_<topic>` naming, when the
+ * host declares no messages of its own and so has no plain channel.
+ */
+function hostName(topic: ChannelInfo): string | null {
+  const suffix = `_${topic.topic?.name ?? ''}`;
+  if (!topic.topic?.name || !topic.name.endsWith(suffix)) return null;
+  return topic.name.slice(0, -suffix.length) || null;
+}
+
+/**
  * Split channels into connections and the topics riding on them.
  *
  * A topic channel shares its connection's address, which is what groups the two;
- * chanx's own Python generator uses the same rule. A topic channel with no plain
- * channel at its address owns its connection, so it is emitted as both.
+ * chanx's own Python generator uses the same rule. With no plain channel at its
+ * address, a hosted topic gets a connection named after its host, carrying no messages
+ * itself; a topic served on its own route is emitted as both.
  */
 export function analyze(document: AsyncAPIDocument): ConnectionInfo[] {
   const buckets = directions(document);
@@ -108,8 +119,18 @@ export function analyze(document: AsyncAPIDocument): ConnectionInfo[] {
       parent.topics.push(topic);
       continue;
     }
-    // No plain channel at this address: the topic channel is its own connection.
-    const standalone: ConnectionInfo = { ...topic, topics: [topic] };
+    const host = hostName(topic);
+    const standalone: ConnectionInfo = host
+      ? {
+          key: topic.key,
+          name: host,
+          address: topic.address,
+          toServer: [],
+          toClient: [],
+          heartbeat: false,
+          topics: [topic],
+        }
+      : { ...topic, topics: [topic] };
     byAddress.set(topic.address, standalone);
     result.push(standalone);
   }
