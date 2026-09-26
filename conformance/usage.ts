@@ -2,7 +2,7 @@
  * Compiled, not run. Every construct here is one the generated code must support:
  * if narrowing, params or topic typing regress, `pnpm typecheck` fails.
  */
-import { createClient } from '@chanx-js/client';
+import { createClient, defineChannel, defineTopic } from '@chanx-js/client';
 import { useChannel, useTopic, useTopics } from '@chanx-js/client/react';
 
 import { chat, roomChat, topicHub } from './generated';
@@ -189,4 +189,35 @@ export function MixedTopics() {
 export function WrongChannel() {
   // @ts-expect-error `chat` carries no topics, so no topic ref belongs to it.
   return useTopic(chat, topicHub.topics.roomTopic.with({ room_name: 'lobby' }));
+}
+
+type Say = { action: 'say'; payload: { text: string } };
+type Said = { action: 'said'; payload: { text: string } };
+type Poke = { action: 'poke'; payload: null };
+type Poked = { action: 'poked'; payload: { by: string } };
+
+const mixed = defineChannel<never, never>()({
+  name: 'mixed',
+  address: '/ws/mixed',
+  topics: {
+    talk: defineTopic<Say, Said>()({ name: 'talk', pattern: 'talk:{room}' }),
+    poke: defineTopic<Poke, Poked>()({ name: 'poke', pattern: 'poke:{user}' }),
+  },
+});
+
+export function TwoTopicsWithOutgoingMessages() {
+  // Both topics send, so the joined set must infer as a union, not the first element.
+  const { lastMessage, sendTopic } = useTopics(mixed, {
+    topics: [
+      mixed.topics.talk.with({ room: 'a' }),
+      mixed.topics.poke.with({ user: 'b' }),
+    ],
+    on: {
+      said: (message) => console.log(message.payload.text),
+      poked: (message) => console.log(message.payload.by),
+    },
+  });
+  sendTopic('poke:b', { action: 'poke', payload: null });
+  if (lastMessage?.action === 'poked') console.log(lastMessage.payload.by);
+  return lastMessage;
 }

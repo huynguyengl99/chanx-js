@@ -50,11 +50,12 @@ export interface UseTopicsResult<
  */
 export function useTopics<
   D extends ChannelDescriptor<any, any, any, any>,
-  Ref extends TopicRefOf<D>,
+  const Refs extends readonly TopicRefOf<D>[],
 >(
   descriptor: D,
-  options: UseTopicsOptions<AddressOf<D>, Ref>,
-): UseTopicsResult<ToServerOf<D>, Ref> {
+  options: UseTopicsOptions<AddressOf<D>, Refs[number]> & { topics: Refs },
+): UseTopicsResult<ToServerOf<D>, Refs[number]> {
+  type Ref = Refs[number];
   const client = useChanxClient();
 
   const key = connectionKey(options);
@@ -64,7 +65,7 @@ export function useTopics<
   // Rebuilt only when the connection or the topic set changes; handlers are synced by
   // the effect below instead.
   const controller = useMemo(
-    () => createTopicsController<D, Ref>(client, descriptor, options),
+    () => createTopicsController<D, Refs>(client, descriptor, options),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [client, descriptor, key, topicKey],
   );

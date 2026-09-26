@@ -233,15 +233,16 @@ export interface UseTopicsResult<ToServer extends ChanxMessage, T extends TopicR
  */
 export function useTopics<
   D extends ChannelDescriptor<any, any, any, any>,
-  T extends TopicRefOf<D>,
+  const Refs extends readonly TopicRefOf<D>[],
 >(
   descriptor: D,
   options: Omit<
-    TopicsControllerOptions<AddressOf<D>, T>,
+    TopicsControllerOptions<AddressOf<D>, Refs[number]>,
     'params' | 'queryParams' | 'topics'
   > &
-    ReactiveConnectOptions & { topics: MaybeRef<readonly T[]> },
-): UseTopicsResult<ToServerOf<D>, T> {
+    ReactiveConnectOptions & { topics: MaybeRef<Refs> },
+): UseTopicsResult<ToServerOf<D>, Refs[number]> {
+  type T = Refs[number];
   const client = useChanxClient();
   const snapshot = shallowRef<TopicsSnapshot<T>>({
     status: options.enabled === false ? 'closed' : 'connecting',
@@ -268,10 +269,10 @@ export function useTopics<
 
   const build = () => {
     teardown();
-    const controller = createTopicsController<D, T>(
+    const controller = createTopicsController<D, Refs>(
       client,
       descriptor,
-      resolved() as TopicsControllerOptions<AddressOf<D>, T>,
+      resolved() as TopicsControllerOptions<AddressOf<D>, T> & { topics: Refs },
     );
     current = controller;
     unsubscribe = controller.subscribe(() => {

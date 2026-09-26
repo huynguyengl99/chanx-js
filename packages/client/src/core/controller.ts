@@ -302,13 +302,16 @@ export interface TopicsController<
  */
 export function createTopicsController<
   D extends ChannelDescriptor<any, any, any, any>,
-  Ref extends TopicRefOf<D> = TopicRefOf<D>,
+  // The whole list, not its element: inferring an element from several refs can settle
+  // on the first one instead of their union.
+  const Refs extends readonly TopicRefOf<D>[] = readonly TopicRefOf<D>[],
 >(
   client: ChanxClient,
   descriptor: D,
-  initialOptions: TopicsControllerOptions<AddressOf<D>, Ref>,
-): TopicsController<ToServerOf<D>, Ref> {
+  initialOptions: TopicsControllerOptions<AddressOf<D>, Refs[number]> & { topics: Refs },
+): TopicsController<ToServerOf<D>, Refs[number]> {
   type ToServer = ToServerOf<D>;
+  type Ref = Refs[number];
   type Snapshot = TopicsSnapshot<Ref>;
 
   let options = initialOptions as TopicsControllerOptions<string, Ref>;
@@ -491,7 +494,7 @@ export function createTopicController<
 ): TopicController<Ref> {
   type Handle = TopicHandle<ToServerOf<Ref>, ToClientOf<Ref>>;
 
-  const inner = createTopicsController<D, Ref>(client, descriptor, {
+  const inner = createTopicsController<D, readonly Ref[]>(client, descriptor, {
     ...initialOptions,
     topics: [topic],
   });

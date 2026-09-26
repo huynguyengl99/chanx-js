@@ -139,12 +139,15 @@ export interface TopicsResult<ToServer extends ChanxMessage, T extends TopicRef>
  */
 export function createTopics<
   D extends ChannelDescriptor<any, any, any, any>,
-  T extends TopicRefOf<D>,
+  const Refs extends readonly TopicRefOf<D>[],
 >(
   descriptor: D,
-  options: TopicsControllerOptions<AddressOf<D>, T> & { client?: ChanxClient },
-): TopicsResult<ToServerOf<D>, T> {
-  const controller = createTopicsController<D, T>(
+  options: TopicsControllerOptions<AddressOf<D>, Refs[number]> & {
+    topics: Refs;
+    client?: ChanxClient;
+  },
+): TopicsResult<ToServerOf<D>, Refs[number]> {
+  const controller = createTopicsController<D, Refs>(
     options.client ?? defaultClient,
     descriptor,
     options,
