@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.2](https://github.com/huynguyengl99/chanx-js/compare/v0.1.1...v0.1.2) (2026-09-26)
+
+### Bug Fixes
+
+- **codegen:** name a topic-only consumer's connection after the consumer ([5499bf7](https://github.com/huynguyengl99/chanx-js/commit/5499bf7073b00adbd70d410ba9438e3b58efc5a8))
+- **codegen:** re-export reused types from schemas ([cf266fa](https://github.com/huynguyengl99/chanx-js/commit/cf266fa8114f008560f6bfbae08de6a7ac0b95b6))
+
 ## [0.1.1](https://github.com/huynguyengl99/chanx-js/compare/v0.1.0...v0.1.1) (2026-09-26)
 
 ### Features

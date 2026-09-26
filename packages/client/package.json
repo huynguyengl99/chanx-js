@@ -1,6 +1,6 @@
 {
   "name": "@chanx-js/client",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Type-safe WebSocket client for chanx AsyncAPI schemas, with topic multiplexing. React, Vue, Svelte and Solid bindings.",
   "license": "MIT",
   "author": "Huy Nguyen",
